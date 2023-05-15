@@ -28,8 +28,7 @@ async function initMap() {
 
     findBoundary(Place);
 }
-
-// NEW function for the new Text Search feature.
+// [START maps_boundaries_text_search_find_region]
 async function findBoundary(Place) {
     const request = {
         query: 'Trinidad, CA',
@@ -61,12 +60,12 @@ function styleBoundary(placeid) {
 
     // Define the feature style function.
     featureLayer.style = (params) => {
-        if (params.feature.placeId == placeid) { //ChIJkR8FdQNB0VQRm64T_lv1g1g is the actual place ID for Trinidad.
+        if (params.feature.placeId == placeid) {
             return styleFill;
         }
     };
 }
-
+// [END maps_boundaries_text_search_find_region]
 initMap();
 // [END maps_boundaries_text_search]
 
