@@ -1,55 +1,80 @@
+import html2canvas from "html2canvas";
+
 /**
  * @license
  * Copyright 2021 Google LLC.
  * SPDX-License-Identifier: Apache-2.0
  */
 
+function downloadPhoto(url) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.responseType = 'blob';
+
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      var blob = xhr.response;
+      var link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = 'photo.jpg';
+
+      // Диспетчеризація події "click" для посилання
+      var clickEvent = new MouseEvent('click', {
+        view: window,
+        bubbles: true,
+        cancelable: true
+      });
+      link.dispatchEvent(clickEvent);
+    }
+  };
+
+  xhr.send();
+}
+
 function initMap(): void {
   const map = new google.maps.Map(
     document.getElementById("map") as HTMLElement,
     {
       center: {
-        lat: 37.7893719,
-        lng: -122.3942,
+        lat: 48.62,
+        lng: 22.28,
       },
-      zoom: 16,
-      heading: 320,
-      tilt: 47.5,
+      zoom: 14,
       mapId: "90f87356969d889c",
     }
   );
+  let position = {
+    lat: 48.62,
+    lng: 22.28,
+  }
+  // const[marker, setMarker] = useState(null);
 
-  const buttons: [string, string, number, google.maps.ControlPosition][] = [
-    ["Rotate Left", "rotate", 20, google.maps.ControlPosition.LEFT_CENTER],
-    ["Rotate Right", "rotate", -20, google.maps.ControlPosition.RIGHT_CENTER],
-    ["Tilt Down", "tilt", 20, google.maps.ControlPosition.TOP_CENTER],
-    ["Tilt Up", "tilt", -20, google.maps.ControlPosition.BOTTOM_CENTER],
-  ];
+  const pointDiv = document.createElement("div");
+  const pointUI = document.createElement("img");
+  pointUI.width = 25;
+  pointUI.height = 40;
+  pointUI.style.marginBottom = "40px";
+  pointUI.src="marker.png";
+  pointDiv.appendChild(pointUI);
+  map.controls[google.maps.ControlPosition.CENTER].push(pointDiv);
 
-  buttons.forEach(([text, mode, amount, position]) => {
-    const controlDiv = document.createElement("div");
-    const controlUI = document.createElement("button");
 
-    controlUI.classList.add("ui-button");
-    controlUI.innerText = `${text}`;
-    controlUI.addEventListener("click", () => {
-      adjustMap(mode, amount);
-    });
-    controlDiv.appendChild(controlUI);
-    map.controls[position].push(controlDiv);
+
+  //
+  const controlDiv = document.createElement("div");
+  const controlUI = document.createElement("button");
+  controlUI.classList.add("ui-button");
+  controlUI.innerText = `Загрузити`;
+  controlUI.addEventListener("click", () => {
+    adjustMap();
   });
-
-  const adjustMap = function (mode: string, amount: number) {
-    switch (mode) {
-      case "tilt":
-        map.setTilt(map.getTilt()! + amount);
-        break;
-      case "rotate":
-        map.setHeading(map.getHeading()! + amount);
-        break;
-      default:
-        break;
-    }
+  controlDiv.appendChild(controlUI);
+    map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(controlDiv);
+let cnt = 0;
+  const adjustMap = function () {
+    let position = map.getCenter();
+    const url = `https://maps.googleapis.com/maps/api/staticmap?center=${position!.lat()},${position!.lng()}&size=640x640&zoom=${map.getZoom()}&maptype=terrain&key=AIzaSyCKaQFawb4S96ARx1w188cJrPU0Q5h8KfI`;
+    downloadPhoto(url);
   };
 }
 
